@@ -1,0 +1,22 @@
+#!/bin/bash
+# list-all, version 2
+# by Pete Magee
+
+# This script presents the status of Oracle Grid Infrastructure resources 
+# in a compressed table format that is easy to read. It accepts one argument
+# as a filter, so you can limit the output to a single resource type, 
+# cluster host, or name.
+
+# Set variables
+CRS_HOME=/u01/apps/oracle/products/grid/12.1.0.2
+FILTER=$1
+
+# Print table header
+/bin/awk 'BEGIN { printf "%-50s%-35s%-20s%-25s\n%-50s%-35s%-20s%-25s\n","Resource Name","Resource Type","Target ","State","=============","=============","======","=====" }'
+
+# If a filter is not specified the print everythine, else grep the output for it
+if [ -z "$FILTER" ]; then
+  $CRS_HOME/bin/crsctl status res | /bin/grep -v "^$"| /bin/awk -F "=" 'BEGIN {print " "} {printf("%s",NR%4 ? $2"|" : $2"\n")}'| /bin/sed -e 's/  *, /,/g' -e 's/, /,/g'| /bin/awk -F "|" 'BEGIN { printf null }{ split ($3,trg,",") split ($4,st,",")}{for (i in trg) {printf "%-50s%-35s%-20s%-25s\n",$1,$2,trg[i],st[i]}}'
+else
+  $CRS_HOME/bin/crsctl status res | /bin/grep -v "^$"| /bin/awk -F "=" 'BEGIN {print " "} {printf("%s",NR%4 ? $2"|" : $2"\n")}'| /bin/sed -e 's/  *, /,/g' -e 's/, /,/g'| /bin/awk -F "|" 'BEGIN { printf null }{ split ($3,trg,",") split ($4,st,",")}{for (i in trg) {printf "%-50s%-35s%-20s%-25s\n",$1,$2,trg[i],st[i]}}' | /bin/grep $FILTER
+fi
