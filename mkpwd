@@ -1,0 +1,17 @@
+#!/bin/bash
+# mkpwd, version 1
+# by Pete Magee
+
+# This script generates a random password of 20 alphanumeric and special 
+# characters. It takes the number of passwords to be created as an 
+# argument.
+
+# For the number of random passwords specified in the command line
+for (( i=1; i<=$1; i++ ))
+do
+
+  # Use the built-in random number generator to determine which characters
+  # to include. Add whatever special characters you wish to utilize in the
+  # template after "[:alnum:]".
+  echo `head -n 10 /dev/urandom | tr -cd "[:alnum:]_!@#$%^&*() " | cut -c '1-20'`
+done
